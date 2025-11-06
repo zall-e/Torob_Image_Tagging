@@ -1,0 +1,30 @@
+# پیکربندی عمومی Prometheus
+global:
+  scrape_interval: 15s # هر 15 ثانیه یکبار معیارها را جمع‌آوری کن
+  evaluation_interval: 15s
+
+# لیست اهداف (Targets) که باید مانیتور شوند
+scrape_configs:
+  # Job 1: مانیتور کردن خود Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Job 2: مانیتور کردن سرور GPU (معیارهای CPU, RAM, Disk)
+  - job_name: 'gpu_server_node'
+    # این Job از Node Exporter روی سرور GPU استفاده می‌کند
+    static_configs:
+      - targets: ['213.233.184.224:9100'] # <<< اینجا IP سرور GPU خود را وارد کنید
+
+  # Job 3: مانیتور کردن معیارهای NVIDIA GPU (VRAM, Temp, Usage)
+  - job_name: 'gpu_server_dcgm'
+    # این Job از DCGM Exporter روی سرور GPU استفاده می‌کند
+    static_configs:
+      - targets: ['213.233.184.224:9400'] # <<< اینجا IP سرور GPU خود را وارد کنید
+
+  # Job 4: مانیتور کردن اپلیکیشن FastAPI/Uvicorn
+  - job_name: 'fastapi_vlm_app'
+    # مسیر /metrics را که به app.py اضافه کردید، می‌خواند
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['213.233.184.224:8000'] # <<< اینجا IP سرور GPU و پورت FastAPI را وارد کنید
